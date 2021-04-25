@@ -13,11 +13,17 @@ class CollisionDetector {
       var obj = gameObjects[i];
 
       if (obj.rigidBody == false) {
-        return false;
+        continue;
       }
 
       if (obj is RectActor) {
         if (_applyCircleRectangleCollisionCheck(player, obj)) {
+          if (obj.isFood) {
+            gameObjects.removeWhere((element) =>
+            element.location.x == obj.location.x
+                && element.location.y == obj.location.y);
+            continue;
+          }
           collisionDetected = true;
         }
       }

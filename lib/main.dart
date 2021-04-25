@@ -1,14 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_game/collision_system.dart';
 import 'package:flutter_game/game_controllers.dart';
+import 'package:flutter_game/map_generator.dart';
 
 import 'game_base.dart';
 import 'models.dart';
 import 'package:vector_math/vector_math.dart' as v;
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+  ]);
+
   runApp(MyApp());
 }
 
@@ -31,13 +39,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<GameObject> gameObjects = [];
   CircleActor player;
-
   GameControllerState controllerState = GameControllerState();
   DateTime currentTime = DateTime.now();
   DateTime oldTime;
-
-  List<GameObject> gameObjects = [];
+  final mapGenerator = MapGenerator();
 
   @override
   void initState() {
@@ -52,18 +59,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // create player
     player = CircleActor();
-    player.radius = 20.0;
-    player.location = v.Vector2(screenSize.width/2, screenSize.height/2);
+    player.radius = 15;
     player.color = Colors.blue;
     player.velocity = v.Vector2(300, 300);
     player.rigidBody = true;
-
-    // create temporary wall
-    final wall = RectActor();
-    wall.location = v.Vector2(100.0, 100.0);
-    wall.width = 500.0;
-    wall.height = 5.0;
-    wall.rigidBody = true;
 
     final circle = CircleActor();
     circle.radius = 20.0;
@@ -73,8 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
     circle.rigidBody = true;
 
     gameObjects.add(player);
-    gameObjects.add(wall);
-    gameObjects.add(circle);
+    gameObjects.addAll(mapGenerator.generateMap(context, player));
 
     setState(() {});
   }
@@ -119,8 +117,6 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {

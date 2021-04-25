@@ -8,6 +8,7 @@ abstract class GameObject {
   double height = .0;
   Color color = Colors.black;
   bool rigidBody = false;
+  bool isFood = false;
 
   void draw(Canvas canvas, Size size);
 }
