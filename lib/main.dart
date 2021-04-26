@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<RectActor> mapObjects = mapGenerator.generateMap(context, player);
 
     createPlayer();
-    createEnemies();
+    await createEnemies();
     gameObjects.add(player);
     gameObjects.addAll(mapObjects);
     gameObjects.addAll(enemies);
@@ -84,16 +84,14 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  void createEnemies() async {
+  Future<void> createEnemies() async {
     for (final location in mapGenerator.enemyLocations) {
       final enemy = CircleActor();
       enemy.location = location;
       enemy.setRadius(15.0);
       enemy.color = Colors.red;
-      enemy.velocity = v.Vector2(300, 300);
+      enemy.velocity = v.Vector2(200, 200);
       enemy.rigidBody = true;
-      enemies.add(enemy);
-      setState(() {});
 
       // load assets
       await enemy.addNewTexture("assets/pac-man-up.png", false);
@@ -101,6 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
       await enemy.addNewTexture("assets/pac-man-down.png", false);
       await enemy.addNewTexture("assets/pac-man-left.png", false);
       enemy.setCurrentImage(enemy.images[3]);
+
+      enemies.add(enemy);
       setState(() {});
     }
   }
