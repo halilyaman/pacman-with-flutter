@@ -5,6 +5,9 @@ import 'models.dart';
 import 'package:vector_math/vector_math.dart' as v;
 
 class MapGenerator {
+  v.Vector2 playerLocation;
+  List<v.Vector2> enemyLocations = [];
+
   RectActor buildRectangle(
       double posX,
       double posY,
@@ -55,7 +58,10 @@ class MapGenerator {
         }
         if (val == 3) {
           // put player
-          player.location = v.Vector2((boxIndexInRow * boxW) + (boxH / 3), (row * boxH) + (boxW / 3));
+          playerLocation = v.Vector2((boxIndexInRow * boxW) + (boxH / 3), (row * boxH) + (boxW / 3));
+        }
+        if (val == 4) {
+          enemyLocations.add(v.Vector2((boxIndexInRow * boxW) + (boxH / 3), (row * boxH) + (boxW / 3)));
         }
         if (val == 0) {
           // put a food

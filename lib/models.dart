@@ -80,20 +80,21 @@ class CircleActor extends Actor {
   @override
   void draw(Canvas canvas, Size size) {
     final center = Offset(location.x, location.y);
-    final Paint imagePaint = Paint();
-    imagePaint.isAntiAlias = true;
-    // imagePaint.imageFilter = ui.ImageFilter.blur(sigmaY: .4, sigmaX: .4);
-    if (currentImage != null) {
-      canvas.drawImage(
-          currentImage,
-          Offset(center.dx - radius, center.dy - radius),
-          imagePaint,
-      );
-      return;
-    }
     Paint paint = Paint();
     paint.color = color;
     canvas.drawCircle(center, radius, paint);
+
+    final Paint imagePaint = Paint();
+    imagePaint.isAntiAlias = true;
+    imagePaint.colorFilter = ColorFilter.mode(color, BlendMode.overlay);
+    // imagePaint.imageFilter = ui.ImageFilter.blur(sigmaY: .4, sigmaX: .4);
+    if (currentImage != null) {
+      canvas.drawImage(
+        currentImage,
+        Offset(center.dx - radius, center.dy - radius),
+        imagePaint,
+      );
+    }
   }
 }
 
@@ -103,6 +104,11 @@ class RectActor extends Actor {
 
   @override
   void draw(Canvas canvas, Size size) {
+    Paint paint = Paint()..color = color;
+    var center = Offset(location.x + width/2, location.y + height/2);
+    var rect = Rect.fromCenter(center: center, width: width, height: height);
+    canvas.drawRect(rect, paint);
+
     final Paint imagePaint = Paint();
     imagePaint.isAntiAlias = true;
     // imagePaint.imageFilter = ui.ImageFilter.blur(sigmaY: .4, sigmaX: .4);
@@ -112,13 +118,7 @@ class RectActor extends Actor {
         Offset(location.x, location.y),
         imagePaint,
       );
-      return;
     }
-
-    Paint paint = Paint()..color = color;
-    var center = Offset(location.x + width/2, location.y + height/2);
-    var rect = Rect.fromCenter(center: center, width: width, height: height);
-    canvas.drawRect(rect, paint);
   }
 }
 
