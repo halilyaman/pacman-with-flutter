@@ -89,6 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void handlePlayerMovement(double deltaTime) {
     if (controllerState.isLeftPressed) {
+      player.currentDirection = VectorDirection.west;
       if (CollisionDetector.checkCollisionsWithPlayer(player, gameObjects)) {
         return;
       }
@@ -96,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     if (controllerState.isRightPressed) {
+      player.currentDirection = VectorDirection.east;
       if (CollisionDetector.checkCollisionsWithPlayer(player, gameObjects)) {
         return;
       }
@@ -103,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     if (controllerState.isUpPressed) {
+      player.currentDirection = VectorDirection.north;
       if (CollisionDetector.checkCollisionsWithPlayer(player, gameObjects)) {
         return;
       }
@@ -110,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     if (controllerState.isDownPressed) {
+      player.currentDirection = VectorDirection.south;
       if (CollisionDetector.checkCollisionsWithPlayer(player, gameObjects)) {
         return;
       }
