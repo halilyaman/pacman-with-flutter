@@ -55,25 +55,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void loadGameComponents() async {
     await Future.delayed(Duration(seconds: 1));
-    final screenSize = MediaQuery.of(context).size;
 
-    // create player
-    player = CircleActor();
-    player.radius = 15;
-    player.color = Colors.blue;
-    player.velocity = v.Vector2(300, 300);
-    player.rigidBody = true;
-
-    final circle = CircleActor();
-    circle.radius = 20.0;
-    circle.location = v.Vector2(screenSize.width/2 + 100, screenSize.height/2 + 100);
-    circle.color = Colors.black;
-    circle.velocity = v.Vector2(100, 100);
-    circle.rigidBody = true;
+    createPlayer();
 
     gameObjects.add(player);
     gameObjects.addAll(mapGenerator.generateMap(context, player));
 
+    setState(() {});
+  }
+
+  void createPlayer() async {
+    player = CircleActor();
+    player.setRadius(15.0);
+    player.color = Colors.blue;
+    player.velocity = v.Vector2(300, 300);
+    player.rigidBody = true;
+
+    // load assets
+    await player.addNewTexture("assets/pac-man-up.png", false);
+    await player.addNewTexture("assets/pac-man-right.png", false);
+    await player.addNewTexture("assets/pac-man-down.png", false);
+    await player.addNewTexture("assets/pac-man-left.png", false);
+    player.setCurrentImage(player.images[3]);
     setState(() {});
   }
 
@@ -83,13 +86,19 @@ class _MyHomePageState extends State<MyHomePage> {
       currentTime = DateTime.now();
       final deltaTime = (currentTime.millisecondsSinceEpoch - oldTime.millisecondsSinceEpoch) / 1000;
 
-      handlePlayerMovement(deltaTime);
+      if (timer.tick > 2000) {
+        handlePlayerMovement(deltaTime);
+      } else {
+        // optimize rendering in first 2000 tick
+        player?.moveRight(deltaTime);
+        player?.moveLeft(deltaTime);
+      }
     });
   }
 
   void handlePlayerMovement(double deltaTime) {
     if (controllerState.isLeftPressed) {
-      player.currentDirection = VectorDirection.west;
+      player.setCurrentImage(player.images[3]);
       if (CollisionDetector.checkCollisionsWithPlayer(player, gameObjects)) {
         return;
       }
@@ -97,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     if (controllerState.isRightPressed) {
-      player.currentDirection = VectorDirection.east;
+      player.setCurrentImage(player.images[1]);
       if (CollisionDetector.checkCollisionsWithPlayer(player, gameObjects)) {
         return;
       }
@@ -105,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     if (controllerState.isUpPressed) {
-      player.currentDirection = VectorDirection.north;
+      player.setCurrentImage(player.images[0]);
       if (CollisionDetector.checkCollisionsWithPlayer(player, gameObjects)) {
         return;
       }
@@ -113,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     }
     if (controllerState.isDownPressed) {
-      player.currentDirection = VectorDirection.south;
+      player.setCurrentImage(player.images[2]);
       if (CollisionDetector.checkCollisionsWithPlayer(player, gameObjects)) {
         return;
       }
@@ -128,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: [
           GameBase(
-            backgroundColor: Colors.redAccent,
+            backgroundColor: Colors.black,
             gameObjects: gameObjects,
           ),
 

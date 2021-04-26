@@ -12,7 +12,8 @@ class MapGenerator {
       double height,
       Color color,
       bool rigidBody,
-      bool isFood)
+      bool isFood,
+      [String assetPath])
   {
     final rect = RectActor();
     rect.location = v.Vector2(posX, posY);
@@ -21,6 +22,10 @@ class MapGenerator {
     rect.height = height;
     rect.rigidBody = rigidBody;
     rect.isFood = isFood;
+    if (assetPath != null) {
+      rect.addNewTexture(assetPath, true);
+    }
+
     return rect;
   }
 
@@ -36,7 +41,17 @@ class MapGenerator {
       for (int val in Maps.map1[row]) {
         if (val == 1) {
           // put a wall
-          map.add(buildRectangle(boxIndexInRow * boxW, row * boxH, boxW, boxH, Colors.black, true, false));
+          map.add(
+              buildRectangle(
+                  boxIndexInRow * boxW,
+                  row * boxH,
+                  boxW,
+                  boxH,
+                  Color(0xff5523cc),
+                  true,
+                  false,
+                  // "assets/wall.jpg"
+              ));
         }
         if (val == 3) {
           // put player
