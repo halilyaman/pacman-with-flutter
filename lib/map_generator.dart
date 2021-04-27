@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_game/maps.dart';
 
-import 'models.dart';
+import 'game_objects.dart';
 import 'package:vector_math/vector_math.dart' as v;
 
 class MapGenerator {
   v.Vector2 playerLocation;
   List<v.Vector2> enemyLocations = [];
+  List<RectActor> map = [];
 
   RectActor buildRectangle(
       double posX,
@@ -26,15 +27,13 @@ class MapGenerator {
     rect.rigidBody = rigidBody;
     rect.isFood = isFood;
     if (assetPath != null) {
-      rect.addNewTexture(assetPath, true);
+      rect.addNewImage(assetPath, true);
     }
 
     return rect;
   }
 
-  List<RectActor> generateMap(BuildContext context, CircleActor player) {
-    List<RectActor> map = [];
-
+  void generateMap(BuildContext context, Actor player) {
     final size = MediaQuery.of(context).size;
 
     final boxW = size.width / 13;
@@ -61,7 +60,7 @@ class MapGenerator {
           playerLocation = v.Vector2((boxIndexInRow * boxW) + (boxH / 3), (row * boxH) + (boxW / 3));
         }
         if (val == 4) {
-          enemyLocations.add(v.Vector2((boxIndexInRow * boxW) + (boxH / 3), (row * boxH) + (boxW / 3)));
+          enemyLocations.add(v.Vector2((boxIndexInRow * boxW) + (boxH / 10), (row * boxH) + (boxW / 10)));
         }
         if (val == 0) {
           // put a food
@@ -81,7 +80,5 @@ class MapGenerator {
         boxIndexInRow++;
       }
     }
-
-    return map;
   }
 }

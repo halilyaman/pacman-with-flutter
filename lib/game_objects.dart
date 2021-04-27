@@ -1,24 +1,24 @@
 import 'dart:async';
-import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_game/collision_system.dart';
 import 'package:vector_math/vector_math.dart' as v;
 import 'dart:ui' as ui;
 
 abstract class GameObject {
-  v.Vector2 location = v.Vector2(0.0, 0.0);
+  v.Vector2 location = v.Vector2(.0, .0);
   v.Vector2 velocity = v.Vector2(10.0, 10.0);
   double width = .0;
   double height = .0;
   Color color = Colors.black;
+  ui.Image currentImage;
+  // indexes: 0=up, 1=right, 2=bottom, 3=left
+  List<ui.Image> images = [];
   bool rigidBody = false;
   bool isFood = false;
-  ui.Image currentImage;
-  List<ui.Image> images = [];
+  bool isPlayer = false;
+  bool isEnemy = false;
 
   void draw(Canvas canvas, Size size);
 }
@@ -27,22 +27,34 @@ abstract class GameObject {
 
 class Actor extends GameObject{
   void moveRight(double deltaTime) {
+    if (images.length > 1) {
+      setCurrentImage(images[1]);
+    }
     this.location.x += this.velocity.x * deltaTime;
   }
 
   void moveLeft(double deltaTime) {
+    if (images.length > 3) {
+      setCurrentImage(images[3]);
+    }
     this.location.x -= this.velocity.x * deltaTime;
   }
 
   void moveUp(double deltaTime) {
+    if (images.length > 0) {
+      setCurrentImage(images[0]);
+    }
     this.location.y -= this.velocity.y * deltaTime;
   }
 
   void moveDown(double deltaTime) {
+    if (images.length > 2) {
+      setCurrentImage(images[2]);
+    }
     this.location.y += this.velocity.y * deltaTime;
   }
 
-  Future<void> addNewTexture(String path, bool setImmediately) async {
+  Future<void> addNewImage(String path, bool setImmediately) async {
     final data = await rootBundle.load(path);
     final codec = await ui.instantiateImageCodec(
         data.buffer.asUint8List(),
@@ -67,7 +79,7 @@ class Actor extends GameObject{
 //////////////////////////////////////////////////////////////////////////
 
 class CircleActor extends Actor {
-  double _radius = 0.0;
+  double _radius = .0;
 
   void setRadius(double radius) {
     _radius = radius;
@@ -82,7 +94,7 @@ class CircleActor extends Actor {
     final center = Offset(location.x, location.y);
     Paint paint = Paint();
     paint.color = color;
-    canvas.drawCircle(center, radius, paint);
+    canvas.drawRect(Rect.fromCircle(center: center, radius: radius), paint);
 
     final Paint imagePaint = Paint();
     imagePaint.isAntiAlias = true;
@@ -101,6 +113,8 @@ class CircleActor extends Actor {
 //////////////////////////////////////////////////////////////////////////
 
 class RectActor extends Actor {
+
+  v.Vector2 get center => v.Vector2(location.x + width/2, location.y + height/2);
 
   @override
   void draw(Canvas canvas, Size size) {

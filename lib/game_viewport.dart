@@ -2,7 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import 'models.dart';
+import 'game_objects.dart';
 
 class ViewPort extends CustomPainter {
   Color color;

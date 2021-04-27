@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'game_viewport.dart';
-import 'models.dart';
+import 'game_objects.dart';
 
 class GameBase extends StatefulWidget {
   final Color backgroundColor;
