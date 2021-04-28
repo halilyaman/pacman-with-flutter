@@ -17,16 +17,14 @@ class _GameBaseState extends State<GameBase> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: CustomPaint(
-        painter: ViewPort(
-          color: widget.backgroundColor,
-          gameObjects: widget.gameObjects,
-        ),
-        child: Container(),
-        willChange: true,
-        isComplex: true,
+    return CustomPaint(
+      painter: ViewPort(
+        color: widget.backgroundColor,
+        gameObjects: widget.gameObjects,
       ),
+      child: Container(),
+      willChange: true,
+      isComplex: true,
     );
   }
 }

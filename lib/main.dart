@@ -6,6 +6,7 @@ import 'package:flutter_game/ai_system.dart';
 import 'package:flutter_game/collision_system.dart';
 import 'package:flutter_game/game_controllers.dart';
 import 'package:flutter_game/map_generator.dart';
+import 'package:flutter_game/particle_generator.dart';
 
 import 'game_base.dart';
 import 'game_objects.dart';
@@ -48,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime oldTime;
   final mapGenerator = MapGenerator();
   final aiController = EnemyAI();
+  ParticleGenerator particleGenerator;
 
   @override
   void initState() {
@@ -62,7 +64,10 @@ class _MyHomePageState extends State<MyHomePage> {
     mapGenerator.generateMap(context, player);
 
     createPlayer();
+    particleGenerator = ParticleGenerator(30, player, gameObjects);
+
     await createEnemies();
+
     gameObjects.add(player);
     gameObjects.addAll(mapGenerator.map);
     gameObjects.addAll(enemies);
@@ -89,12 +94,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> createEnemies() async {
     for (final location in mapGenerator.enemyLocations) {
-      final enemy = RectActor();
+      final enemy = CircleActor();
       enemy.location = location;
-      enemy.width = 30.0;
-      enemy.height = 30.0;
+      enemy.setRadius(15.0);
       enemy.color = Colors.black;
-      enemy.velocity = v.Vector2(200, 200);
+      enemy.velocity = v.Vector2(100, 100);
       enemy.rigidBody = true;
       enemy.isEnemy = true;
 
@@ -110,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void startGameLoop() {
+    // set this back into 1 microsecond on release mode
     Timer.periodic(Duration(milliseconds: 1), (timer) {
       oldTime = currentTime;
       currentTime = DateTime.now();
@@ -117,7 +122,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (timer.tick > 5000) {
         handlePlayerMovement(deltaTime);
-        aiController.moveEnemies(deltaTime, gameObjects);
+        particleGenerator.update(deltaTime);
+        aiController.moveEnemies(deltaTime, gameObjects, player);
         setState(() {});
       } else {
         // optimize rendering in first 2000 tick
@@ -129,6 +135,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void handlePlayerMovement(double deltaTime) {
     if (CollisionDetector.checkActorCollisions(player, gameObjects)) {
+      particleGenerator.showParticles = true;
+      Timer.periodic(Duration(milliseconds: 200), (timer) {
+        if (timer.tick > 1) {
+          particleGenerator.showParticles = false;
+          timer.cancel();
+        }
+      });
       return;
     }
 
@@ -152,27 +165,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          GameBase(
-            backgroundColor: Colors.black,
-            gameObjects: gameObjects,
-          ),
-
-          GameControllers(
-            state: controllerState,
-            // onUpPressed: () {
-            // },
-            // onDownPressed: () {
-            // },
-            // onLeftPressed: () {
-            // },
-            // onRightPressed: () {
-            // },
-          )
-        ],
-      )
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            GameBase(
+              backgroundColor: Colors.black,
+              gameObjects: gameObjects,
+            ),
+            GameControllers(
+              state: controllerState,
+              // onUpPressed: () {
+              // },
+              // onDownPressed: () {
+              // },
+              // onLeftPressed: () {
+              // },
+              // onRightPressed: () {
+              // },
+            )
+          ],
+        )
+      ),
     );
   }
 }

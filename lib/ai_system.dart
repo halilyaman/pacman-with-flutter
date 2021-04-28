@@ -8,16 +8,22 @@ class EnemyAI {
     _enemies.add(enemy);
   }
 
-  VectorDirection _decideMoveDirection() {
-    return VectorDirection.east;
+  VectorDirection _decideMoveDirection(Actor enemy, List<GameObject> gameObjects, Actor player) {
+
+    return null;
   }
 
-  void moveEnemies(double deltaTime, List<GameObject> gameObjects) {
+  void moveEnemies(double deltaTime, List<GameObject> gameObjects, Actor player) {
     for (final enemy in _enemies) {
       if (CollisionDetector.checkActorCollisions(enemy, gameObjects)) {
         continue;
       }
-      final moveDirection = _decideMoveDirection();
+      final moveDirection = _decideMoveDirection(enemy, gameObjects, player);
+
+      if (moveDirection == null) {
+        continue;
+      }
+
       switch(moveDirection) {
         case VectorDirection.north:
           enemy.moveUp(deltaTime);

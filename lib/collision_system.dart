@@ -29,7 +29,8 @@ class CollisionDetector {
       }
 
       if (obj is RectActor && actor is CircleActor) {
-        if (_applyCircleRectangleCollisionCheck(actor, obj)) {
+        final collision = applyCircleRectangleCollisionCheck(actor, obj);
+        if (collision["collision"]) {
           if (obj.isFood && actor.isPlayer) {
             gameObjects.removeWhere((element) =>
             element.location.x == obj.location.x
@@ -41,13 +42,15 @@ class CollisionDetector {
       }
 
       if (obj is CircleActor && actor is CircleActor) {
-        if (_applyCircleCircleCollisionCheck(actor, obj)) {
+        final collision = applyCircleCircleCollisionCheck(actor, obj);
+        if (collision["collision"]) {
           collisionDetected = true;
         }
       }
 
       if (obj is RectActor && actor is RectActor) {
-        if (_applyRectRectCollisionCheck(actor, obj)) {
+        final collision = applyRectRectCollisionCheck(actor, obj);
+        if (collision["collision"]) {
           collisionDetected = true;
         }
       }
@@ -56,14 +59,14 @@ class CollisionDetector {
     return collisionDetected;
   }
 
-  static bool _applyRectRectCollisionCheck(RectActor obj1, RectActor obj2) {
+  static Map<String, dynamic> applyRectRectCollisionCheck(RectActor obj1, RectActor obj2) {
     if (obj1.location.x < obj2.location.x + obj2.width
         && obj1.location.x + obj1.width > obj2.location.x
         && obj1.location.y + obj1.height > obj2.location.y
         && obj1.location.y < obj2.location.y + obj2.height) {
 
       final diff = obj2.center - obj1.center;
-      final vectorDir = _calcVectorDirection(diff);
+      final vectorDir = calcVectorDirection(diff);
 
       // horizontal collision
       if (vectorDir == VectorDirection.west || vectorDir == VectorDirection.east) {
@@ -84,18 +87,19 @@ class CollisionDetector {
         }
       }
 
-      return true;
+      return {"collision": true, "direction": vectorDir};
     }
-    return false;
+    return {"collision": false, "direction": null};
   }
 
-  static bool _applyCircleCircleCollisionCheck(CircleActor obj1, CircleActor obj2) {
+  static Map<String, dynamic> applyCircleCircleCollisionCheck(CircleActor obj1, CircleActor obj2) {
     final dist = obj1.location.distanceTo(obj2.location);
     final collisionDetected = dist < obj1.radius + obj2.radius;
+    VectorDirection vectorDir;
 
     if (collisionDetected) {
       final diff = obj1.location - obj2.location;
-      final vectorDir = _calcVectorDirection(diff);
+      vectorDir = calcVectorDirection(diff);
       // horizontal collision
       if (vectorDir == VectorDirection.west || vectorDir == VectorDirection.east) {
         double penetration = obj1.radius - diff.x.abs();
@@ -115,10 +119,10 @@ class CollisionDetector {
         }
       }
     }
-    return collisionDetected;
+    return {"collision": collisionDetected, "direction": vectorDir};
   }
 
-  static bool _applyCircleRectangleCollisionCheck(CircleActor circleObj, RectActor rectObj) {
+  static Map<String, dynamic> applyCircleRectangleCollisionCheck(CircleActor circleObj, RectActor rectObj) {
     // calculate rectangle's half extent and center
     final rectHalfExtent = v.Vector2(rectObj.width/2, rectObj.height/2);
     final rectCenter = rectObj.center;
@@ -133,7 +137,7 @@ class CollisionDetector {
     diff = closest - circleObj.location;
 
     if (diff.length < circleObj.radius) {
-      final vectorDir = _calcVectorDirection(diff);
+      final vectorDir = calcVectorDirection(diff);
 
       // horizontal collision
       if (vectorDir == VectorDirection.west || vectorDir == VectorDirection.east) {
@@ -153,13 +157,13 @@ class CollisionDetector {
           circleObj.location.y += penetration;
         }
       }
-      return true;
+      return {"collision": true, "direction": vectorDir};
     }
 
-    return false;
+    return {"collision": false, "direction": null};
   }
 
-  static VectorDirection _calcVectorDirection(v.Vector2 vec) {
+  static VectorDirection calcVectorDirection(v.Vector2 vec) {
     final compass = [
       v.Vector2(0.0, 1.0),
       v.Vector2(1.0, 0.0),

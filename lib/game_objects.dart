@@ -19,6 +19,7 @@ abstract class GameObject {
   bool isFood = false;
   bool isPlayer = false;
   bool isEnemy = false;
+  bool isWall = false;
 
   void draw(Canvas canvas, Size size);
 }
@@ -136,6 +137,11 @@ class RectActor extends Actor {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////
 
-
-
+class Particle extends RectActor {
+  double totalTime = 0.2;
+  double timeALive = 0.0;
+  double yVel = 0.0;
+  double xVel = 0.0;
+}
